@@ -1,0 +1,12 @@
+import { telegramCall } from './client';
+export type Chat = {id:number;title?:string;username?:string;type:string};
+export type Member = {status:string;can_post_messages?:boolean;can_delete_messages?:boolean;can_manage_chat?:boolean;can_post_stories?:boolean};
+export const getMe=()=>telegramCall<{id:number;username:string}>('getMe');
+export const getChat=(chat_id:number|string)=>telegramCall<Chat>('getChat',{chat_id});
+export const getChatMember=(chat_id:number|string,user_id:number|string)=>telegramCall<Member>('getChatMember',{chat_id,user_id});
+export const sendMessage=(chat_id:number|string,text:string)=>telegramCall<{message_id:number}>('sendMessage',{chat_id,text});
+export const sendPhoto=(chat_id:number|string,photo:string,caption?:string)=>telegramCall<{message_id:number}>('sendPhoto',{chat_id,photo,caption});
+export const sendVideo=(chat_id:number|string,video:string,caption?:string)=>telegramCall<{message_id:number}>('sendVideo',{chat_id,video,caption});
+export const forwardMessage=(chat_id:number|string,from_chat_id:number|string,message_id:number)=>telegramCall<{message_id:number}>('forwardMessage',{chat_id,from_chat_id,message_id});
+export const deleteMessage=(chat_id:number|string,message_id:number)=>telegramCall<boolean>('deleteMessage',{chat_id,message_id});
+export const setWebhook=(url:string,secret_token?:string)=>telegramCall<boolean>('setWebhook',{url,secret_token});
