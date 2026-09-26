@@ -19,3 +19,7 @@ A Vercel-ready Next.js dashboard for ingesting Telegram channel posts, matching 
 ## Deploy
 
 Import the repository into Vercel, set the environment variables, and deploy. No Vercel Cron is configured, so Hobby-plan deployments do not require a Cron-enabled plan. On a Hobby team, commits must be associated with the GitHub account linked to the Vercel team owner or production deployments may be blocked. Scheduled posts are still saved in Supabase, but automatic dispatch requires an external scheduler (or a Vercel plan with Cron support) to call `/api/cron/publish-scheduled` with the configured `CRON_SECRET`. Use a Supabase project for PostgreSQL and Auth; create the first admin profile manually after signup.
+
+## Install on Android
+
+The dashboard is an installable PWA. Deploy it to an HTTPS URL, open it in Chrome on Android, then use **⋮ → Install app** (or **Add to Home screen**). The first visit needs an internet connection so the service worker can install. The service worker only provides a generic offline page for navigation failures; it deliberately does not cache API responses, account data, or private dashboard pages.
