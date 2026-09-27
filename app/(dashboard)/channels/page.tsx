@@ -79,7 +79,7 @@ export default function Channels() {
       <button className="btn primary" onClick={() => setAdding((value) => !value)}><Plus size={14} /> {adding ? 'Close' : 'Add channel'}</button>
     </div>
     {adding && <form className="card channel-add" onSubmit={(event) => { event.preventDefault(); void addChannel(new FormData(event.currentTarget)); }}>
-      <div><div className="eyebrow">Register a {tab} channel</div><div className="muted channel-hint">Use the public @username or numeric Telegram chat ID. The bot must already have access.</div></div>
+      <div><div className="eyebrow">Register a {tab} channel</div><div className="muted channel-hint">Use the exact public @username or numeric -100… chat ID. Add the bot to the channel first; it needs administrator access for channels.</div></div>
       <div className="channel-add-controls"><input className="input" name="telegram_chat_id" required placeholder="@channelname or -100…" aria-label="Telegram channel username or ID" /><button className="btn primary" type="submit">Add channel</button></div>
     </form>}
     {!!data?.channels.length && <section className="card leaderboard-card" aria-labelledby="subscriber-leaderboard-title">
