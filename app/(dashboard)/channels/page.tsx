@@ -60,6 +60,13 @@ export default function Channels() {
   }
 
   const rows = data?.channels.filter((channel) => channel.type === tab) ?? [];
+  const rankedChannels = (data?.channels ?? [])
+    .flatMap((channel) => {
+      const count = subscriberCounts[channel.id]?.count;
+      return typeof count === 'number' ? [{ channel, count }] : [];
+    })
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
 
   return <DashboardShell>
     <Toaster theme="dark" />
@@ -75,20 +82,35 @@ export default function Channels() {
       <div><div className="eyebrow">Register a {tab} channel</div><div className="muted channel-hint">Use the public @username or numeric Telegram chat ID. The bot must already have access.</div></div>
       <div className="channel-add-controls"><input className="input" name="telegram_chat_id" required placeholder="@channelname or -100…" aria-label="Telegram channel username or ID" /><button className="btn primary" type="submit">Add channel</button></div>
     </form>}
-    <div className="tabs">
-      <button className={`tab ${tab === 'source' ? 'active' : ''}`} onClick={() => setTab('source')}><Radio size={13} className="inline-icon" />Source channels <span className="muted">{data?.channels.filter((channel) => channel.type === 'source').length ?? '—'}</span></button>
-      <button className={`tab ${tab === 'destination' ? 'active' : ''}`} onClick={() => setTab('destination')}><Send size={13} className="inline-icon" />Destination channels <span className="muted">{data?.channels.filter((channel) => channel.type === 'destination').length ?? '—'}</span></button>
-    </div>
-    {loading ? <LoadingState label="Loading channels…" /> : error ? <ErrorState message={error} onRetry={reload} /> : !rows.length ? <EmptyState title={`No ${tab} channels registered`} detail="Add a channel to connect this dashboard to your Telegram network." /> : <div className="card table-card">
-      <div className="subscriber-tools">
-        <span className="muted" title={subscribersUpdatedAt ? formatDate(subscribersUpdatedAt) : undefined}>
-          {subscribersUpdatedAt ? `Subscriber counts updated ${formatDate(subscribersUpdatedAt)}` : 'Subscriber counts load from Telegram'}
-        </span>
+    {!!data?.channels.length && <section className="card leaderboard-card" aria-labelledby="subscriber-leaderboard-title">
+      <div className="leaderboard-heading">
+        <div>
+          <div className="eyebrow">Audience / ranking</div>
+          <h2 className="panel-title" id="subscriber-leaderboard-title">Top channels by subscribers</h2>
+          <div className="muted leaderboard-subtitle">Across all source and destination channels</div>
+        </div>
         <button className="btn small" disabled={subscribersLoading} onClick={() => void refreshSubscriberCounts(true)}>
           <RefreshCw size={12} className={subscribersLoading ? 'spin' : ''} />
           {subscribersLoading ? 'Refreshing…' : 'Refresh counts'}
         </button>
       </div>
+      <div className="muted leaderboard-updated" title={subscribersUpdatedAt ? formatDate(subscribersUpdatedAt) : undefined}>
+        {subscribersUpdatedAt ? `Counts updated ${formatDate(subscribersUpdatedAt)}` : 'Counts load from Telegram'}
+      </div>
+      {subscribersLoading && !rankedChannels.length ? <div className="muted leaderboard-empty">Loading subscriber rankings…</div> : !rankedChannels.length ? <div className="muted leaderboard-empty">No subscriber counts are available yet. Check bot access and refresh.</div> : <ol className="leaderboard-list">
+        {rankedChannels.map(({ channel, count }, index) => <li className="leaderboard-item" key={channel.id}>
+          <span className={`leaderboard-rank ${index === 0 ? 'leaderboard-rank-first' : ''}`}>{String(index + 1).padStart(2, '0')}</span>
+          <div className="leaderboard-channel"><strong>{channel.title}</strong><span className="muted">{channel.type === 'source' ? 'Source' : 'Destination'}{channel.username ? ` · @${channel.username.replace(/^@/, '')}` : ''}</span></div>
+          <span className="leaderboard-count">{numberFormat.format(count)} <small>subscribers</small></span>
+        </li>)}
+      </ol>}
+      <div className="muted leaderboard-footnote">Only channels with a successfully retrieved count are ranked.</div>
+    </section>}
+    <div className="tabs">
+      <button className={`tab ${tab === 'source' ? 'active' : ''}`} onClick={() => setTab('source')}><Radio size={13} className="inline-icon" />Source channels <span className="muted">{data?.channels.filter((channel) => channel.type === 'source').length ?? '—'}</span></button>
+      <button className={`tab ${tab === 'destination' ? 'active' : ''}`} onClick={() => setTab('destination')}><Send size={13} className="inline-icon" />Destination channels <span className="muted">{data?.channels.filter((channel) => channel.type === 'destination').length ?? '—'}</span></button>
+    </div>
+    {loading ? <LoadingState label="Loading channels…" /> : error ? <ErrorState message={error} onRetry={reload} /> : !rows.length ? <EmptyState title={`No ${tab} channels registered`} detail="Add a channel to connect this dashboard to your Telegram network." /> : <div className="card table-card">
       <table className="table"><thead><tr><th>Channel</th><th>Telegram ID</th><th>Subscribers</th><th>Status</th><th>Last permission check</th><th>Actions</th></tr></thead>
         <tbody>{rows.map((channel) => {
           const missingRights = tab === 'destination' && !channel.can_post;
@@ -105,6 +127,6 @@ export default function Channels() {
         })}</tbody>
       </table>
     </div>}
-    <div className="notice page-note">Subscriber counts are read from Telegram when this page loads. The bot must be able to access each channel; unavailable counts appear as —. Source channels need read access. Destination channels must grant the bot administrator posting rights; deletion rights enable removing messages from the Published page.</div>
+    <div className="notice page-note">Subscriber counts are read from Telegram when this page loads. The ranking shows the top five across both tabs; channels without a returned count are omitted. The bot must be able to access each channel. Source channels need read access. Destination channels must grant the bot administrator posting rights; deletion rights enable removing messages from the Published page.</div>
   </DashboardShell>;
 }

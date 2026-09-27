@@ -27,3 +27,6 @@ The dashboard is an installable PWA. Deploy it to an HTTPS URL, open it in Chrom
 ## Channel subscriber counts
 
 The Channels page requests current member counts from Telegram when the page loads and includes a **Refresh counts** button. The bot must be able to access each channel; if Telegram rejects a count request, that channel displays **—** and the error is available as a tooltip.
+
+
+The page also ranks the **top five channels across both source and destination types** by current subscriber count. Channels whose counts could not be retrieved are omitted from the ranking.
