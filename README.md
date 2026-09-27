@@ -23,3 +23,7 @@ Import the repository into Vercel, set the environment variables, and deploy. No
 ## Install on Android
 
 The dashboard is an installable PWA. Deploy it to an HTTPS URL, open it in Chrome on Android, then use **⋮ → Install app** (or **Add to Home screen**). The first visit needs an internet connection so the service worker can install. The service worker only provides a generic offline page for navigation failures; it deliberately does not cache API responses, account data, or private dashboard pages.
+
+## Channel subscriber counts
+
+The Channels page requests current member counts from Telegram when the page loads and includes a **Refresh counts** button. The bot must be able to access each channel; if Telegram rejects a count request, that channel displays **—** and the error is available as a tooltip.

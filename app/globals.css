@@ -10,4 +10,6 @@
 @media(max-width:370px){.bottom-nav-link{font-size:8px}.main{padding-inline:10px}.grid4{gap:10px}.card{padding:12px}.bottom-nav{padding-inline:1px}}
 
 .post-action-controls{display:flex;align-items:center;gap:8px}.mode-select{width:auto;min-width:110px;padding:7px 9px;font-size:11px}.draft-mode-note{font-size:11px;padding:11px 13px}
+.subscriber-tools{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 4px 14px;font-size:11px}
 @media(max-width:640px){.post-action-controls{width:100%}.post-action-controls .mode-select{flex:1}.post-action-controls .btn{justify-content:center}}
+@media(max-width:640px){.subscriber-tools{align-items:flex-start;flex-direction:column}}
