@@ -3,7 +3,12 @@ import { createClient } from '@supabase/supabase-js';
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || 'https://placeholder.supabase.co';
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || 'placeholder-service-role-key';
 
-export const admin = createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
+const uncachedFetch: typeof fetch = (input, init) => fetch(input, { ...init, cache: 'no-store' });
+
+export const admin = createClient(url, key, {
+  auth: { autoRefreshToken: false, persistSession: false },
+  global: { fetch: uncachedFetch },
+});
 
 export function supabaseAdminConfigError() {
   if (url.includes('placeholder') || key === 'placeholder-service-role-key') {

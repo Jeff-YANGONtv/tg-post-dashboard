@@ -64,6 +64,7 @@ export type DashboardData = {
 export async function request<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, {
     ...init,
+    cache: 'no-store',
     headers: { 'content-type': 'application/json', ...(init?.headers ?? {}) },
   });
   const payload = await response.json().catch(() => ({}));
