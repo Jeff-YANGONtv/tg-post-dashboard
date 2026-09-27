@@ -3,6 +3,7 @@ export type Chat = {id:number;title?:string;username?:string;type:string};
 export type Member = {status:string;can_post_messages?:boolean;can_delete_messages?:boolean;can_manage_chat?:boolean;can_post_stories?:boolean};
 export const getMe=(token?:string)=>telegramCall<{id:number;username:string}>('getMe',{},0,token);
 export const getChat=(chat_id:number|string)=>telegramCall<Chat>('getChat',{chat_id});
+export const getChatMemberCount=(chat_id:number|string)=>telegramCall<number>('getChatMemberCount',{chat_id});
 export const getChatMember=(chat_id:number|string,user_id:number|string)=>telegramCall<Member>('getChatMember',{chat_id,user_id});
 export const sendMessage=(chat_id:number|string,text:string)=>telegramCall<{message_id:number}>('sendMessage',{chat_id,text});
 export const sendPhoto=(chat_id:number|string,photo:string,caption?:string)=>telegramCall<{message_id:number}>('sendPhoto',{chat_id,photo,caption});
