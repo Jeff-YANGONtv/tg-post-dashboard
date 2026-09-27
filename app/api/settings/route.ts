@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { admin, supabaseAdminConfigError } from '../../../lib/supabase/admin';
 import { getMe } from '../../../lib/telegram/actions';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 function maskToken(token: string | null | undefined) {
   if (!token) return null;
   return token.length > 10 ? `${token.slice(0, 6)}••••••${token.slice(-4)}` : '••••••••';
