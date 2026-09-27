@@ -10,4 +10,6 @@ export const sendPhoto=(chat_id:number|string,photo:string,caption?:string)=>tel
 export const sendVideo=(chat_id:number|string,video:string,caption?:string)=>telegramCall<{message_id:number}>('sendVideo',{chat_id,video,caption});
 export const forwardMessage=(chat_id:number|string,from_chat_id:number|string,message_id:number)=>telegramCall<{message_id:number}>('forwardMessage',{chat_id,from_chat_id,message_id});
 export const deleteMessage=(chat_id:number|string,message_id:number)=>telegramCall<boolean>('deleteMessage',{chat_id,message_id});
-export const setWebhook=(url:string,secret_token?:string)=>telegramCall<boolean>('setWebhook',{url,secret_token});
+export type WebhookInfo = { url: string; pending_update_count: number; last_error_message?: string; last_error_date?: number };
+export const setWebhook=(url:string,secret_token?:string,token?:string)=>telegramCall<boolean>('setWebhook',{url,secret_token},0,token);
+export const getWebhookInfo=(token?:string)=>telegramCall<WebhookInfo>('getWebhookInfo',{},0,token);
