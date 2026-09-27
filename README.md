@@ -13,8 +13,9 @@ A Vercel-ready Next.js dashboard for ingesting Telegram channel posts, matching 
 
 - Add the bot to source channels so it can read channel posts.
 - Add the bot as an administrator to destination channels with post and delete permissions.
-- Set the webhook to `https://YOUR_DOMAIN/api/telegram/webhook` and include the same `TELEGRAM_WEBHOOK_SECRET` as the `X-Telegram-Bot-Api-Secret-Token` header.
-- Use the dashboard Settings page to connect the webhook after setting the token.
+- Set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and the server-only `SUPABASE_SERVICE_ROLE_KEY` in the deployment environment. Apply the SQL migration before using Settings.
+- After deploying to a public HTTPS domain, save the bot token on the Settings page. The app checks it with Telegram before storing it.
+- Select **Connect webhook** on Settings. The app registers `https://YOUR_DOMAIN/api/telegram/webhook` with Telegram and creates/stores a shared secret in Supabase if none is already configured. Do not expose `SUPABASE_SERVICE_ROLE_KEY` or the bot token in browser code.
 
 ## Deploy
 
