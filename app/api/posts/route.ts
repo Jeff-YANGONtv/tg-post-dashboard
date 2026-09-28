@@ -30,3 +30,44 @@ export async function POST(req: NextRequest) {
     { status: 201 }
   );
 }
+
+export async function DELETE(req: NextRequest) {
+  const body = (await req.json().catch(() => null)) as {
+    post_id?: string;
+  } | null;
+  if (!body?.post_id)
+    return NextResponse.json({ error: "Post ID is required" }, { status: 400 });
+
+  const [published, scheduled] = await Promise.all([
+    admin
+      .from("published_messages")
+      .select("id", { count: "exact", head: true })
+      .eq("post_id", body.post_id),
+    admin
+      .from("scheduled_publications")
+      .select("id", { count: "exact", head: true })
+      .eq("post_id", body.post_id),
+  ]);
+  const lookupError = published.error ?? scheduled.error;
+  if (lookupError)
+    return NextResponse.json({ error: lookupError.message }, { status: 500 });
+  if ((published.count ?? 0) > 0 || (scheduled.count ?? 0) > 0)
+    return NextResponse.json(
+      {
+        error: "Posts with delivery history cannot be deleted from this screen",
+      },
+      { status: 409 }
+    );
+
+  const { data, error } = await admin
+    .from("posts")
+    .delete()
+    .eq("id", body.post_id)
+    .select("id")
+    .maybeSingle();
+  if (error)
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (!data)
+    return NextResponse.json({ error: "Post not found" }, { status: 404 });
+  return NextResponse.json({ ok: true });
+}

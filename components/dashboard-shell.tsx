@@ -91,16 +91,16 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </button>
       </header>
       <main className="main">{children}</main>
-      <nav className="bottom-nav" aria-label="Primary navigation">
+      <nav className="mobile-tabs" aria-label="Primary navigation">
         {items.map(([href, label, Icon]) => (
           <Link
             key={href}
             href={href}
-            className={`bottom-nav-link ${path === href ? "active" : ""}`}
+            className={`mobile-tab-link ${path === href ? "active" : ""}`}
             aria-current={path === href ? "page" : undefined}
           >
-            <Icon size={17} />
-            <span>{label}</span>
+            <Icon size={16} aria-hidden="true" />
+            <span>{label === "Published" ? "Published" : label}</span>
           </Link>
         ))}
       </nav>
