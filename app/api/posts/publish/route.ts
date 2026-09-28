@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
                   channel.telegram_chat_id,
                   post.text ?? post.caption ?? ""
                 );
-      const { data } = await admin
+      const { data, error: recordError } = await admin
         .from("published_messages")
         .upsert(
           {
@@ -88,6 +88,15 @@ export async function POST(req: NextRequest) {
         )
         .select()
         .single();
+      if (recordError || !data) {
+        results.push({
+          destination_channel_id,
+          status: "failed",
+          telegram_message_id: message.message_id,
+          error_message: `Telegram sent message ${message.message_id}, but its published record could not be saved. Check the Supabase schema/permissions before retrying to avoid a duplicate. ${recordError?.message ?? "No record was returned."}`,
+        });
+        continue;
+      }
       results.push(data);
     } catch (e) {
       const error_message = e instanceof Error ? e.message : "Publish failed";
