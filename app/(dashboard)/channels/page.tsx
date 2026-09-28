@@ -293,91 +293,97 @@ export default function Channels() {
           detail="Add a channel to connect this dashboard to your Telegram network."
         />
       ) : (
-        <div className="card table-card">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Channel</th>
-                <th>Telegram ID</th>
-                <th>Subscribers</th>
-                <th>Status</th>
-                <th>Last permission check</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map(channel => {
-                const missingRights =
-                  tab === "destination" && !channel.can_post;
-                const status = !channel.is_active
-                  ? "Paused"
-                  : missingRights
-                    ? "Missing post rights"
-                    : "Ready";
-                const subscriber = subscriberCounts[channel.id];
-                return (
-                  <tr key={channel.id}>
-                    <td>
-                      <div className="table-primary">{channel.title}</div>
-                      <div className="muted table-sub">
-                        {channel.username
-                          ? `@${channel.username.replace(/^@/, "")}`
-                          : "No public username"}
-                      </div>
-                    </td>
-                    <td className="mono muted">{channel.telegram_chat_id}</td>
-                    <td
-                      className="mono"
-                      title={
-                        subscriber?.error ?? "Current Telegram subscriber count"
-                      }
-                    >
+        <div className="channel-grid">
+          {rows.map(channel => {
+            const missingRights = tab === "destination" && !channel.can_post;
+            const status = !channel.is_active
+              ? "Paused"
+              : missingRights
+                ? "Missing post rights"
+                : "Ready";
+            const subscriber = subscriberCounts[channel.id];
+            return (
+              <article className="card channel-card" key={channel.id}>
+                <div className="channel-card-top">
+                  <div className="brand-mark channel-kind">
+                    {tab === "source" ? (
+                      <Radio size={16} />
+                    ) : (
+                      <Send size={16} />
+                    )}
+                  </div>
+                  <div className="channel-card-name">
+                    <div className="channel-name">{channel.title}</div>
+                    <div className="muted channel-handle">
+                      {channel.username
+                        ? `@${channel.username.replace(/^@/, "")}`
+                        : "No public username"}
+                    </div>
+                  </div>
+                  <span
+                    className={`badge ${!channel.is_active ? "amber" : missingRights ? "red" : "green"}`}
+                  >
+                    {missingRights ? (
+                      <ShieldAlert size={12} />
+                    ) : (
+                      <CheckCircle2 size={12} />
+                    )}
+                    {status}
+                  </span>
+                </div>
+
+                <div className="channel-stat-grid">
+                  <div className="channel-stat">
+                    <span className="channel-stat-label">Telegram ID</span>
+                    <span className="mono channel-stat-value">
+                      {channel.telegram_chat_id}
+                    </span>
+                  </div>
+                  <div
+                    className="channel-stat"
+                    title={
+                      subscriber?.error ?? "Current Telegram subscriber count"
+                    }
+                  >
+                    <span className="channel-stat-label">Subscribers</span>
+                    <span className="mono channel-stat-value">
                       {typeof subscriber?.count === "number"
                         ? numberFormat.format(subscriber.count)
                         : subscribersLoading
                           ? "…"
                           : "—"}
-                    </td>
-                    <td>
-                      <span
-                        className={`badge ${!channel.is_active ? "amber" : missingRights ? "red" : "green"}`}
-                      >
-                        {missingRights ? (
-                          <ShieldAlert size={12} />
-                        ) : (
-                          <CheckCircle2 size={12} />
-                        )}
-                        {status}
-                      </span>
-                      {channel.last_error && (
-                        <div className="channel-error">
-                          {channel.last_error}
-                        </div>
-                      )}
-                    </td>
-                    <td className="muted">
+                    </span>
+                  </div>
+                </div>
+
+                {channel.last_error && (
+                  <div className="channel-error channel-card-error">
+                    {channel.last_error}
+                  </div>
+                )}
+
+                <div className="channel-card-footer">
+                  <div className="channel-checked">
+                    <span className="muted">Last permission check</span>
+                    <strong>
                       {formatDate(channel.last_permission_check_at)}
-                    </td>
-                    <td>
-                      <button
-                        className="btn small"
-                        disabled={busyId === channel.id}
-                        onClick={() => void testChannel(channel.id)}
-                      >
-                        <RefreshCw
-                          size={12}
-                          className={busyId === channel.id ? "spin" : ""}
-                        />
-                        {busyId === channel.id
-                          ? "Checking…"
-                          : "Test permissions"}
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                    </strong>
+                  </div>
+                  <button
+                    className="btn small"
+                    disabled={busyId === channel.id}
+                    onClick={() => void testChannel(channel.id)}
+                  >
+                    <RefreshCw
+                      size={12}
+                      className={busyId === channel.id ? "spin" : ""}
+                    />
+                    {busyId === channel.id ? "Checking…" : "Test permissions"}
+                  </button>
+                </div>
+              </article>
+            );
+          })}
         </div>
       )}
       <div className="notice page-note">
