@@ -3,6 +3,9 @@ node_modules/
 .pnpm-store/
 
 # Build outputs
+.next/
+out/
+.vercel/
 dist/
 build/
 *.dist

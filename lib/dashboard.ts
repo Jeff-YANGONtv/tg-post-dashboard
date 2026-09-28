@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from "react";
 
 export type Channel = {
   id: string;
-  type: 'source' | 'destination';
+  type: "source" | "destination";
   title: string;
   username: string | null;
   telegram_chat_id: number | string;
@@ -44,8 +44,8 @@ export type PublishedMessage = {
   post_id: string;
   destination_channel_id: string;
   telegram_message_id: number | null;
-  publish_mode: 'copy' | 'forward';
-  status: 'pending' | 'posted' | 'failed' | 'deleted';
+  publish_mode: "copy" | "forward";
+  status: "pending" | "posted" | "failed" | "deleted";
   posted_at: string | null;
   deleted_at: string | null;
   error_message: string | null;
@@ -64,11 +64,12 @@ export type DashboardData = {
 export async function request<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, {
     ...init,
-    cache: 'no-store',
-    headers: { 'content-type': 'application/json', ...(init?.headers ?? {}) },
+    cache: "no-store",
+    headers: { "content-type": "application/json", ...(init?.headers ?? {}) },
   });
   const payload = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(payload.error || `Request failed (${response.status})`);
+  if (!response.ok)
+    throw new Error(payload.error || `Request failed (${response.status})`);
   return payload as T;
 }
 
@@ -80,24 +81,31 @@ export function useDashboardData() {
     setLoading(true);
     setError(null);
     try {
-      setData(await request<DashboardData>('/api/dashboard'));
+      setData(await request<DashboardData>("/api/dashboard"));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not load dashboard data');
+      setError(
+        err instanceof Error ? err.message : "Could not load dashboard data"
+      );
     } finally {
       setLoading(false);
     }
   }, []);
-  useEffect(() => { void reload(); }, [reload]);
+  useEffect(() => {
+    void reload();
+  }, [reload]);
   return { data, loading, error, reload };
 }
 
 export function formatDate(value: string | null | undefined) {
-  if (!value) return '—';
+  if (!value) return "—";
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '—';
-  return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
+  if (Number.isNaN(date.getTime())) return "—";
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
 }
 
 export function postText(post: Post | null | undefined) {
-  return post?.text || post?.caption || 'Media post';
+  return post?.text || post?.caption || "Media post";
 }

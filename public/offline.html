@@ -6,20 +6,68 @@
     <meta name="theme-color" content="#08111f" />
     <title>Offline — Signal Relay</title>
     <style>
-      :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #08111f; color: #e7f0fb; }
-      body { min-height: 100vh; margin: 0; display: grid; place-items: center; padding: 24px; box-sizing: border-box; }
-      main { width: min(100%, 420px); padding: 28px; border: 1px solid #1e334d; border-radius: 18px; background: #0d1929; }
-      .mark { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 22px; border-radius: 14px; color: #08111f; background: linear-gradient(135deg, #40d9e8, #4b8dff); font-weight: 900; font-size: 22px; }
-      h1 { margin: 0 0 10px; font-size: 24px; }
-      p { color: #8da2ba; line-height: 1.6; }
-      button { margin-top: 12px; padding: 11px 16px; border: 0; border-radius: 9px; color: #07131f; background: #40d9e8; font: inherit; font-weight: 700; cursor: pointer; }
+      :root {
+        color-scheme: dark;
+        font-family: system-ui, sans-serif;
+        background: #08111f;
+        color: #e7f0fb;
+      }
+      body {
+        min-height: 100vh;
+        margin: 0;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        box-sizing: border-box;
+      }
+      main {
+        width: min(100%, 420px);
+        padding: 28px;
+        border: 1px solid #1e334d;
+        border-radius: 18px;
+        background: #0d1929;
+      }
+      .mark {
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        margin-bottom: 22px;
+        border-radius: 14px;
+        color: #08111f;
+        background: linear-gradient(135deg, #40d9e8, #4b8dff);
+        font-weight: 900;
+        font-size: 22px;
+      }
+      h1 {
+        margin: 0 0 10px;
+        font-size: 24px;
+      }
+      p {
+        color: #8da2ba;
+        line-height: 1.6;
+      }
+      button {
+        margin-top: 12px;
+        padding: 11px 16px;
+        border: 0;
+        border-radius: 9px;
+        color: #07131f;
+        background: #40d9e8;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
     <main>
       <div class="mark" aria-hidden="true">S</div>
       <h1>You’re offline</h1>
-      <p>Signal Relay needs an internet connection to load your dashboard and Telegram workspace data. Reconnect, then try again.</p>
+      <p>
+        Signal Relay needs an internet connection to load your dashboard and
+        Telegram workspace data. Reconnect, then try again.
+      </p>
       <button type="button" onclick="location.reload()">Try again</button>
     </main>
   </body>

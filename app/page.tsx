@@ -1,19 +1,187 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { ArrowUpRight, CalendarClock, CheckCircle2, Radio, Send, TriangleAlert } from 'lucide-react';
-import { DashboardShell } from '../components/dashboard-shell';
-import { EmptyState, ErrorState, LoadingState } from '../components/data-state';
-import { formatDate, postText, useDashboardData } from '../lib/dashboard';
+import Link from "next/link";
+import {
+  ArrowUpRight,
+  CalendarClock,
+  CheckCircle2,
+  Radio,
+  Send,
+  TriangleAlert,
+} from "lucide-react";
+import { DashboardShell } from "../components/dashboard-shell";
+import { EmptyState, ErrorState, LoadingState } from "../components/data-state";
+import { formatDate, postText, useDashboardData } from "../lib/dashboard";
 
 export default function Home() {
   const { data, loading, error, reload } = useDashboardData();
-  const activeSources = data?.channels.filter((channel) => channel.type === 'source' && channel.is_active).length ?? 0;
-  const publishedToday = data?.published.filter((item) => item.status === 'posted' && item.posted_at && new Date(item.posted_at).toDateString() === new Date().toDateString()).length ?? 0;
-  const pending = data?.scheduled.filter((item) => item.status === 'pending').length ?? 0;
-  const failed = data?.published.filter((item) => item.status === 'failed').length ?? 0;
-  const recent = [...(data?.published ?? [])].sort((a, b) => new Date(b.posted_at ?? b.created_at).getTime() - new Date(a.posted_at ?? a.created_at).getTime()).slice(0, 5);
-  return <DashboardShell><div className="topline"><div><div className="eyebrow">Operations / overview</div><h1 className="h1">Network overview</h1><div className="muted" style={{ fontSize: 13, marginTop: 7 }}>Live activity from your Telegram distribution workspace.</div></div><Link href="/posts" className="btn primary"><Send size={14} /> New publication</Link></div>
-    {loading ? <LoadingState label="Syncing your dashboard…" /> : error ? <ErrorState message={error} onRetry={reload} /> : <><div className="grid grid4"><div className="card stat"><div className="stat-label">Active source channels</div><div className="stat-value cyan">{activeSources}</div><div className="stat-foot muted">Registered in channel settings</div></div><div className="card stat"><div className="stat-label">Published today</div><div className="stat-value green">{publishedToday}</div><div className="stat-foot muted">Successful Telegram deliveries</div></div><div className="card stat"><div className="stat-label">In queue</div><div className="stat-value amber">{pending}</div><div className="stat-foot muted">Scheduled for future delivery</div></div><div className="card stat"><div className="stat-label">Failed deliveries</div><div className="stat-value red">{failed}</div><div className="stat-foot muted">Review records for error details</div></div></div><div className="grid grid2 overview-panels"><div className="card"><div className="panel-heading"><div><div className="eyebrow">Network status</div><h2 className="panel-title">Connected channels</h2></div><Link className="btn small" href="/channels">Manage <ArrowUpRight size={13} /></Link></div><div className="list"><div className="list-item"><div className="list-label"><Radio size={16} className="cyan"/><div><strong>Sources</strong><div className="muted">Channels feeding the inbox</div></div></div><span className="badge blue">{activeSources} active</span></div><div className="list-item"><div className="list-label"><Send size={16} className="green"/><div><strong>Destinations</strong><div className="muted">Channels available for publishing</div></div></div><span className="badge blue">{data?.channels.filter((channel) => channel.type === 'destination' && channel.is_active && channel.can_post).length ?? 0} ready</span></div></div></div><div className="card"><div className="panel-heading"><div><div className="eyebrow">Activity</div><h2 className="panel-title">Recent publications</h2></div><Link className="btn small" href="/published">View all <ArrowUpRight size={13} /></Link></div>{recent.length ? <div className="list">{recent.map((item) => <div className="list-item" key={item.id}><div className="list-label">{item.status === 'posted' ? <CheckCircle2 size={16} className="green" /> : <TriangleAlert size={16} className="red" />}<div><strong className="activity-post">{postText(item.post)}</strong><div className="muted">{item.destination_channel?.title ?? 'Unknown channel'} · {item.status}</div></div></div><span className="muted activity-time">{formatDate(item.posted_at ?? item.created_at)}</span></div>)}</div> : <EmptyState title="No publication activity" detail="Successful and failed deliveries will appear here." />}</div></div><div className="notice page-note"><CalendarClock size={15} /> Numbers and activity are calculated from the connected workspace data.</div></>}
-  </DashboardShell>;
+  const activeSources =
+    data?.channels.filter(
+      channel => channel.type === "source" && channel.is_active
+    ).length ?? 0;
+  const publishedToday =
+    data?.published.filter(
+      item =>
+        item.status === "posted" &&
+        item.posted_at &&
+        new Date(item.posted_at).toDateString() === new Date().toDateString()
+    ).length ?? 0;
+  const pending =
+    data?.scheduled.filter(item => item.status === "pending").length ?? 0;
+  const failed =
+    data?.published.filter(item => item.status === "failed").length ?? 0;
+  const recent = [...(data?.published ?? [])]
+    .sort(
+      (a, b) =>
+        new Date(b.posted_at ?? b.created_at).getTime() -
+        new Date(a.posted_at ?? a.created_at).getTime()
+    )
+    .slice(0, 5);
+  return (
+    <DashboardShell>
+      <div className="topline">
+        <div>
+          <div className="eyebrow">Operations / overview</div>
+          <h1 className="h1">Network overview</h1>
+          <div className="muted" style={{ fontSize: 13, marginTop: 7 }}>
+            Live activity from your Telegram distribution workspace.
+          </div>
+        </div>
+        <Link href="/posts" className="btn primary">
+          <Send size={14} /> New publication
+        </Link>
+      </div>
+      {loading ? (
+        <LoadingState label="Syncing your dashboard…" />
+      ) : error ? (
+        <ErrorState message={error} onRetry={reload} />
+      ) : (
+        <>
+          <div className="grid grid4">
+            <div className="card stat">
+              <div className="stat-label">Active source channels</div>
+              <div className="stat-value cyan">{activeSources}</div>
+              <div className="stat-foot muted">
+                Registered in channel settings
+              </div>
+            </div>
+            <div className="card stat">
+              <div className="stat-label">Published today</div>
+              <div className="stat-value green">{publishedToday}</div>
+              <div className="stat-foot muted">
+                Successful Telegram deliveries
+              </div>
+            </div>
+            <div className="card stat">
+              <div className="stat-label">In queue</div>
+              <div className="stat-value amber">{pending}</div>
+              <div className="stat-foot muted">
+                Scheduled for future delivery
+              </div>
+            </div>
+            <div className="card stat">
+              <div className="stat-label">Failed deliveries</div>
+              <div className="stat-value red">{failed}</div>
+              <div className="stat-foot muted">
+                Review records for error details
+              </div>
+            </div>
+          </div>
+          <div className="grid grid2 overview-panels">
+            <div className="card">
+              <div className="panel-heading">
+                <div>
+                  <div className="eyebrow">Network status</div>
+                  <h2 className="panel-title">Connected channels</h2>
+                </div>
+                <Link className="btn small" href="/channels">
+                  Manage <ArrowUpRight size={13} />
+                </Link>
+              </div>
+              <div className="list">
+                <div className="list-item">
+                  <div className="list-label">
+                    <Radio size={16} className="cyan" />
+                    <div>
+                      <strong>Sources</strong>
+                      <div className="muted">Channels feeding the inbox</div>
+                    </div>
+                  </div>
+                  <span className="badge blue">{activeSources} active</span>
+                </div>
+                <div className="list-item">
+                  <div className="list-label">
+                    <Send size={16} className="green" />
+                    <div>
+                      <strong>Destinations</strong>
+                      <div className="muted">
+                        Channels available for publishing
+                      </div>
+                    </div>
+                  </div>
+                  <span className="badge blue">
+                    {data?.channels.filter(
+                      channel =>
+                        channel.type === "destination" &&
+                        channel.is_active &&
+                        channel.can_post
+                    ).length ?? 0}{" "}
+                    ready
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="card">
+              <div className="panel-heading">
+                <div>
+                  <div className="eyebrow">Activity</div>
+                  <h2 className="panel-title">Recent publications</h2>
+                </div>
+                <Link className="btn small" href="/published">
+                  View all <ArrowUpRight size={13} />
+                </Link>
+              </div>
+              {recent.length ? (
+                <div className="list">
+                  {recent.map(item => (
+                    <div className="list-item" key={item.id}>
+                      <div className="list-label">
+                        {item.status === "posted" ? (
+                          <CheckCircle2 size={16} className="green" />
+                        ) : (
+                          <TriangleAlert size={16} className="red" />
+                        )}
+                        <div>
+                          <strong className="activity-post">
+                            {postText(item.post)}
+                          </strong>
+                          <div className="muted">
+                            {item.destination_channel?.title ??
+                              "Unknown channel"}{" "}
+                            · {item.status}
+                          </div>
+                        </div>
+                      </div>
+                      <span className="muted activity-time">
+                        {formatDate(item.posted_at ?? item.created_at)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  title="No publication activity"
+                  detail="Successful and failed deliveries will appear here."
+                />
+              )}
+            </div>
+          </div>
+          <div className="notice page-note">
+            <CalendarClock size={15} /> Numbers and activity are calculated from
+            the connected workspace data.
+          </div>
+        </>
+      )}
+    </DashboardShell>
+  );
 }

@@ -1,1 +1,0 @@
-export function telegramLink(username:string|undefined,chatId:number,messageId:number){if(username)return `https://t.me/${username.replace(/^@/,'')}/${messageId}`;const clean=String(chatId).replace(/^-100/,'');return `https://t.me/c/${clean}/${messageId}`}
