@@ -973,68 +973,6 @@ button {
   }
 }
 
-.logout-link {
-  width: 100%;
-  border: 0;
-  background: transparent;
-  text-align: left;
-  cursor: pointer;
-}
-.mobile-logout {
-  display: none;
-  margin-left: auto;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #292c33;
-  color: var(--text);
-  padding: 7px;
-}
-.login-page {
-  display: grid;
-  min-height: 100vh;
-  place-items: center;
-  padding: 24px;
-}
-.login-card {
-  width: min(100%, 440px);
-  padding: 32px;
-}
-.login-mark {
-  margin-bottom: 22px;
-}
-.login-copy,
-.login-footnote {
-  font-size: 12px;
-  line-height: 1.6;
-}
-.login-message {
-  margin-top: 14px;
-}
-.login-form {
-  display: grid;
-  gap: 10px;
-  margin-top: 24px;
-}
-.login-submit {
-  justify-content: center;
-  margin-top: 8px;
-}
-.login-footnote {
-  margin: 20px 0 0;
-}
-@media (max-width: 640px) {
-  .mobile-logout {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-}
-@media (max-width: 480px) {
-  .login-card {
-    padding: 24px 18px;
-  }
-}
-
 /* Responsive database card grids for channels and posts */
 .post-list {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
@@ -1446,4 +1384,97 @@ button {
 .broadcast-delete:disabled {
   cursor: not-allowed;
   opacity: 0.4;
+}
+
+/* Responsive grids for database posts and delivery records */
+.broadcast-post-list {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+}
+.published-record-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  align-items: stretch;
+  gap: 14px;
+}
+.published-record-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 14px;
+  overflow: hidden;
+  padding: 18px;
+}
+.published-record-head {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.published-record-head > .badge {
+  flex: none;
+}
+.published-record-destination {
+  max-width: 70%;
+  overflow-wrap: anywhere;
+}
+.published-record-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+.published-record-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.published-record-stat {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #15171c;
+}
+.published-record-stat span {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.published-record-stat strong {
+  overflow-wrap: anywhere;
+  font-size: 11px;
+  line-height: 1.45;
+}
+.published-record-error {
+  max-width: none;
+  overflow-wrap: anywhere;
+}
+.published-record-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.published-record-actions .btn {
+  justify-content: center;
+}
+@media (max-width: 640px) {
+  .broadcast-post-list,
+  .published-record-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .published-record-actions .btn {
+    flex: 1;
+  }
 }

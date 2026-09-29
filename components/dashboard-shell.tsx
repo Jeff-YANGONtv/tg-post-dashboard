@@ -7,12 +7,10 @@ import {
   CalendarClock,
   Inbox,
   LayoutDashboard,
-  LogOut,
   Radio,
   Send,
   Settings,
 } from "lucide-react";
-import { getSupabaseBrowserClient } from "../lib/supabase/client";
 
 const items = [
   ["/", "Overview", LayoutDashboard],
@@ -25,14 +23,6 @@ const items = [
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
-
-  async function signOut() {
-    try {
-      await getSupabaseBrowserClient().auth.signOut();
-    } finally {
-      window.location.assign("/login");
-    }
-  }
 
   return (
     <div className="shell">
@@ -71,10 +61,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </div>
-        <button className="nav-link logout-link" onClick={() => void signOut()}>
-          <LogOut size={16} />
-          <span>Sign out</span>
-        </button>
       </aside>
       <header className="mobile-brand">
         <div className="brand-mark">↗</div>
@@ -82,13 +68,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           <div className="brand-title">SIGNAL RELAY</div>
           <div className="brand-sub">TELEGRAM CONTROL ROOM</div>
         </div>
-        <button
-          className="mobile-logout"
-          onClick={() => void signOut()}
-          aria-label="Sign out"
-        >
-          <LogOut size={16} />
-        </button>
       </header>
       <main className="main">{children}</main>
       <nav className="mobile-tabs" aria-label="Primary navigation">

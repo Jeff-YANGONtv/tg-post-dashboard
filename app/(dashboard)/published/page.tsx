@@ -114,122 +114,112 @@ export default function Published() {
           }
         />
       ) : (
-        <div className="card table-card">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Post</th>
-                <th>Destination</th>
-                <th>Mode</th>
-                <th>Published</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map(record => {
-                const username = record.destination_channel?.username;
-                const url =
-                  username && record.telegram_message_id
-                    ? `https://t.me/${username.replace(/^@/, "")}/${record.telegram_message_id}`
-                    : null;
-                return (
-                  <tr key={record.id}>
-                    <td>
-                      <div className="table-primary published-post">
-                        {postText(record.post)}
-                      </div>
-                      <div className="muted table-sub">
-                        from{" "}
-                        {record.post?.source_channel?.title ?? "Manual draft"}
-                      </div>
-                    </td>
-                    <td>
-                      <span className="badge blue">
-                        {record.destination_channel?.title ?? "Unknown channel"}
-                      </span>
-                    </td>
-                    <td className="mono muted">{record.publish_mode}</td>
-                    <td className="muted">
+        <div className="published-record-grid">
+          {rows.map(record => {
+            const username = record.destination_channel?.username;
+            const url =
+              username && record.telegram_message_id
+                ? `https://t.me/${username.replace(/^@/, "")}/${record.telegram_message_id}`
+                : null;
+            return (
+              <article className="card published-record-card" key={record.id}>
+                <div className="published-record-head">
+                  <span className="badge blue published-record-destination">
+                    {record.destination_channel?.title ?? "Unknown channel"}
+                  </span>
+                  <span
+                    className={`badge ${record.status === "posted" ? "green" : record.status === "failed" ? "red" : "amber"}`}
+                  >
+                    {record.status}
+                  </span>
+                </div>
+                <div className="published-record-text">
+                  {postText(record.post)}
+                </div>
+                <div className="published-record-meta">
+                  <div className="published-record-stat">
+                    <span>Source</span>
+                    <strong>
+                      {record.post?.source_channel?.title ?? "Manual draft"}
+                    </strong>
+                  </div>
+                  <div className="published-record-stat">
+                    <span>Mode</span>
+                    <strong>{record.publish_mode}</strong>
+                  </div>
+                  <div className="published-record-stat">
+                    <span>Published</span>
+                    <strong>
                       {formatDate(record.posted_at ?? record.created_at)}
-                    </td>
-                    <td>
-                      <span
-                        className={`badge ${record.status === "posted" ? "green" : record.status === "failed" ? "red" : "amber"}`}
-                      >
-                        {record.status}
-                      </span>
-                      {record.error_message && (
-                        <div className="channel-error">
-                          {record.error_message}
-                        </div>
-                      )}
-                    </td>
-                    <td>
-                      <div className="action-row">
-                        <button
-                          className="btn small"
-                          onClick={() =>
-                            void copyLink(
-                              record.id,
-                              username,
-                              record.telegram_message_id
-                            )
-                          }
-                        >
-                          {copied === record.id ? (
-                            <Check size={12} />
-                          ) : (
-                            <Copy size={12} />
-                          )}
-                          {copied === record.id ? "Copied" : "Copy link"}
-                        </button>
-                        {url ? (
-                          <a
-                            className="btn small"
-                            href={url}
-                            target="_blank"
-                            rel="noreferrer"
-                            aria-label="Open Telegram message"
-                          >
-                            <ExternalLink size={12} />
-                            Open
-                          </a>
-                        ) : (
-                          <button
-                            className="btn small"
-                            disabled
-                            title="No public Telegram link is available"
-                          >
-                            <ExternalLink size={12} />
-                            Open
-                          </button>
-                        )}
-                        {record.status === "posted" && (
-                          <button
-                            className="btn small danger"
-                            disabled={
-                              busyId === record.id ||
-                              !record.destination_channel?.can_delete
-                            }
-                            title={
-                              !record.destination_channel?.can_delete
-                                ? "Bot lacks delete permission"
-                                : "Delete this message"
-                            }
-                            onClick={() => void deleteRecord(record.id)}
-                          >
-                            <Trash2 size={12} />
-                            Delete
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                    </strong>
+                  </div>
+                </div>
+                {record.error_message && (
+                  <div className="channel-error published-record-error">
+                    {record.error_message}
+                  </div>
+                )}
+                <div className="published-record-actions">
+                  <button
+                    className="btn small"
+                    onClick={() =>
+                      void copyLink(
+                        record.id,
+                        username,
+                        record.telegram_message_id
+                      )
+                    }
+                  >
+                    {copied === record.id ? (
+                      <Check size={12} />
+                    ) : (
+                      <Copy size={12} />
+                    )}
+                    {copied === record.id ? "Copied" : "Copy link"}
+                  </button>
+                  {url ? (
+                    <a
+                      className="btn small"
+                      href={url}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label="Open Telegram message"
+                    >
+                      <ExternalLink size={12} />
+                      Open
+                    </a>
+                  ) : (
+                    <button
+                      className="btn small"
+                      disabled
+                      title="No public Telegram link is available"
+                    >
+                      <ExternalLink size={12} />
+                      Open
+                    </button>
+                  )}
+                  {record.status === "posted" && (
+                    <button
+                      className="btn small danger"
+                      disabled={
+                        busyId === record.id ||
+                        !record.destination_channel?.can_delete
+                      }
+                      title={
+                        !record.destination_channel?.can_delete
+                          ? "Bot lacks delete permission"
+                          : "Delete this message"
+                      }
+                      onClick={() => void deleteRecord(record.id)}
+                    >
+                      <Trash2 size={12} />
+                      Delete
+                    </button>
+                  )}
+                </div>
+              </article>
+            );
+          })}
         </div>
       )}
     </DashboardShell>
