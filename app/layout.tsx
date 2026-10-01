@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { PwaRegister } from "../components/pwa-register";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "Signal Relay",
@@ -42,6 +43,7 @@ export default function RootLayout({
       <body>
         <PwaRegister />
         {children}
+        <SpeedInsights />
       </body>
     </html>
   );
