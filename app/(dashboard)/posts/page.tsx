@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Image as ImageIcon, Plus, Send, Trash2, Video } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import { DashboardShell } from "../../../components/dashboard-shell";
+import { ChannelAvatar } from "../../../components/channel-avatar";
 import {
   EmptyState,
   ErrorState,
@@ -17,7 +18,9 @@ import {
 } from "../../../lib/dashboard";
 
 export default function Posts() {
-  const { data, loading, error, reload } = useDashboardData();
+  const { data, loading, error, reload } = useDashboardData({
+    refreshIntervalMs: 10_000,
+  });
   const [showComposer, setShowComposer] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
   const [channelPickerPostId, setChannelPickerPostId] = useState("");
@@ -245,7 +248,15 @@ export default function Posts() {
                         name="destinations"
                         value={channel.id}
                       />
-                      <span>{channel.title}</span>
+                      <ChannelAvatar channel={channel} size={28} />
+                      <span className="channel-choice-copy">
+                        <strong>{channel.title}</strong>
+                        <small>
+                          {channel.username
+                            ? `@${channel.username.replace(/^@/, "")}`
+                            : "No public username"}
+                        </small>
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -356,7 +367,15 @@ export default function Posts() {
                                   toggleChannel(post.id, channel.id)
                                 }
                               />
-                              <span>{channel.title}</span>
+                              <ChannelAvatar channel={channel} size={28} />
+                              <span className="channel-choice-copy">
+                                <strong>{channel.title}</strong>
+                                <small>
+                                  {channel.username
+                                    ? `@${channel.username.replace(/^@/, "")}`
+                                    : "No public username"}
+                                </small>
+                              </span>
                             </label>
                           ))}
                         </div>

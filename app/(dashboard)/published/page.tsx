@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Check, Copy, ExternalLink, Trash2 } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import { DashboardShell } from "../../../components/dashboard-shell";
+import { ChannelAvatar } from "../../../components/channel-avatar";
 import {
   EmptyState,
   ErrorState,
@@ -17,7 +18,15 @@ import {
 } from "../../../lib/dashboard";
 
 export default function Published() {
-  const { data, loading, error, reload } = useDashboardData();
+  const {
+    data,
+    loading,
+    error,
+    refreshing,
+    refreshError,
+    lastUpdatedAt,
+    reload,
+  } = useDashboardData({ refreshIntervalMs: 10_000 });
   const [filter, setFilter] = useState("all");
   const [busyId, setBusyId] = useState("");
   const [copied, setCopied] = useState("");
@@ -76,9 +85,19 @@ export default function Published() {
           <div className="muted" style={{ fontSize: 13, marginTop: 7 }}>
             Every outbound message, in one place.
           </div>
+          <div className="muted published-live-status" aria-live="polite">
+            {refreshError
+              ? "Live refresh delayed; showing the last loaded records."
+              : "Auto-updates every 10 seconds while this page is visible."}
+            {lastUpdatedAt ? ` Last updated ${formatDate(lastUpdatedAt)}.` : ""}
+          </div>
         </div>
-        <button className="btn" onClick={reload}>
-          Refresh records
+        <button
+          className="btn"
+          disabled={loading || refreshing}
+          onClick={reload}
+        >
+          {refreshing ? "Updating…" : "Refresh records"}
         </button>
       </div>
       {!loading && !error && (
@@ -125,7 +144,15 @@ export default function Published() {
               <article className="card published-record-card" key={record.id}>
                 <div className="published-record-head">
                   <span className="badge blue published-record-destination">
-                    {record.destination_channel?.title ?? "Unknown channel"}
+                    {record.destination_channel && (
+                      <ChannelAvatar
+                        channel={record.destination_channel}
+                        size={22}
+                      />
+                    )}
+                    <span className="published-record-destination-text">
+                      {record.destination_channel?.title ?? "Unknown channel"}
+                    </span>
                   </span>
                   <span
                     className={`badge ${record.status === "posted" ? "green" : record.status === "failed" ? "red" : "amber"}`}

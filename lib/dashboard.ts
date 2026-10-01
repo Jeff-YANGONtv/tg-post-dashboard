@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export type Channel = {
   id: string;
@@ -61,6 +61,10 @@ export type DashboardData = {
   published: PublishedMessage[];
 };
 
+type DashboardDataOptions = {
+  refreshIntervalMs?: number;
+};
+
 export async function request<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, {
     ...init,
@@ -73,27 +77,77 @@ export async function request<T>(url: string, init?: RequestInit): Promise<T> {
   return payload as T;
 }
 
-export function useDashboardData() {
+export function useDashboardData(options: DashboardDataOptions = {}) {
+  const refreshIntervalMs = options.refreshIntervalMs ?? 0;
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const reload = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const [refreshError, setRefreshError] = useState<string | null>(null);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
+  const requestInFlight = useRef(false);
+  const hasData = useRef(false);
+
+  const load = useCallback(async (showLoading: boolean) => {
+    if (requestInFlight.current) return;
+    requestInFlight.current = true;
+    if (showLoading) {
+      setLoading(true);
+      setError(null);
+    } else {
+      setRefreshing(true);
+    }
+
     try {
-      setData(await request<DashboardData>("/api/dashboard"));
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Could not load dashboard data"
-      );
+      const freshData = await request<DashboardData>("/api/dashboard");
+      hasData.current = true;
+      setData(freshData);
+      setError(null);
+      setRefreshError(null);
+      setLastUpdatedAt(new Date().toISOString());
+    } catch (cause) {
+      const message =
+        cause instanceof Error
+          ? cause.message
+          : "Could not load dashboard data";
+      if (showLoading || !hasData.current) setError(message);
+      else setRefreshError(message);
     } finally {
-      setLoading(false);
+      requestInFlight.current = false;
+      if (showLoading) setLoading(false);
+      else setRefreshing(false);
     }
   }, []);
+
+  const reload = useCallback(() => load(true), [load]);
+  const refresh = useCallback(() => load(false), [load]);
+
   useEffect(() => {
     void reload();
   }, [reload]);
-  return { data, loading, error, reload };
+
+  useEffect(() => {
+    if (!refreshIntervalMs || refreshIntervalMs < 1000) return;
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === "visible") void refresh();
+    };
+    const interval = window.setInterval(refreshWhenVisible, refreshIntervalMs);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+    return () => {
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+    };
+  }, [refresh, refreshIntervalMs]);
+
+  return {
+    data,
+    loading,
+    refreshing,
+    error,
+    refreshError,
+    lastUpdatedAt,
+    reload,
+  };
 }
 
 export function formatDate(value: string | null | undefined) {

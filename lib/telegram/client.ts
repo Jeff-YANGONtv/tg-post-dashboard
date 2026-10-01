@@ -12,6 +12,8 @@ async function resolveToken(explicit?: string) {
   return data?.telegram_bot_token?.trim() || envToken();
 }
 
+export const getConfiguredTelegramToken = () => resolveToken();
+
 export type TelegramResponse<T> = {
   ok: boolean;
   result?: T;
@@ -74,4 +76,74 @@ export async function telegramCall<T>(
     data.description ?? `Telegram ${method} failed (HTTP ${response.status}).`,
     data.parameters?.retry_after
   );
+}
+
+const MAX_PROFILE_PHOTO_BYTES = 5 * 1024 * 1024;
+
+export async function downloadTelegramFile(
+  filePath: string,
+  token?: string
+): Promise<{ data: ArrayBuffer; contentType: string }> {
+  const botToken = await resolveToken(token);
+  if (!botToken)
+    throw new TelegramError("Telegram bot token is not configured");
+
+  const segments = filePath.split("/");
+  if (
+    !filePath ||
+    filePath.startsWith("/") ||
+    filePath.includes("\\") ||
+    filePath.includes("?") ||
+    filePath.includes("#") ||
+    segments.some(segment => !segment || segment === "." || segment === "..")
+  ) {
+    throw new TelegramError("Telegram returned an invalid file path.");
+  }
+
+  const encodedPath = segments.map(encodeURIComponent).join("/");
+  let response: Response;
+  try {
+    response = await fetch(
+      `https://api.telegram.org/file/bot${botToken}/${encodedPath}`,
+      { cache: "no-store" }
+    );
+  } catch {
+    throw new TelegramError("Could not reach Telegram's file server.");
+  }
+
+  if (!response.ok)
+    throw new TelegramError(
+      `Telegram file download failed (HTTP ${response.status}).`
+    );
+
+  const declaredSize = Number(response.headers.get("content-length") ?? 0);
+  if (declaredSize > MAX_PROFILE_PHOTO_BYTES)
+    throw new TelegramError("Telegram profile photo exceeds the size limit.");
+
+  const data = await response.arrayBuffer();
+  if (data.byteLength > MAX_PROFILE_PHOTO_BYTES)
+    throw new TelegramError("Telegram profile photo exceeds the size limit.");
+
+  const headerType =
+    response.headers.get("content-type")?.split(";")[0].trim().toLowerCase() ??
+    "";
+  const extension = filePath.split(".").pop()?.toLowerCase();
+  const inferredType =
+    extension === "jpg" || extension === "jpeg"
+      ? "image/jpeg"
+      : extension === "png"
+        ? "image/png"
+        : extension === "webp"
+          ? "image/webp"
+          : "";
+  const contentType = headerType.startsWith("image/")
+    ? headerType
+    : headerType === "application/octet-stream" || !headerType
+      ? inferredType
+      : "";
+
+  if (!contentType)
+    throw new TelegramError("Telegram returned a non-image profile file.");
+
+  return { data, contentType };
 }

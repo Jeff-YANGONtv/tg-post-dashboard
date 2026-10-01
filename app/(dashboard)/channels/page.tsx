@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import { DashboardShell } from "../../../components/dashboard-shell";
+import { ChannelAvatar } from "../../../components/channel-avatar";
 import {
   EmptyState,
   ErrorState,
@@ -238,6 +239,11 @@ export default function Channels() {
                   >
                     {String(index + 1).padStart(2, "0")}
                   </span>
+                  <ChannelAvatar
+                    channel={channel}
+                    size={32}
+                    className="leaderboard-avatar"
+                  />
                   <div className="leaderboard-channel">
                     <strong>{channel.title}</strong>
                     <span className="muted">
@@ -305,13 +311,7 @@ export default function Channels() {
             return (
               <article className="card channel-card" key={channel.id}>
                 <div className="channel-card-top">
-                  <div className="brand-mark channel-kind">
-                    {tab === "source" ? (
-                      <Radio size={16} />
-                    ) : (
-                      <Send size={16} />
-                    )}
-                  </div>
+                  <ChannelAvatar channel={channel} className="channel-kind" />
                   <div className="channel-card-name">
                     <div className="channel-name">{channel.title}</div>
                     <div className="muted channel-handle">
