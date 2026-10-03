@@ -71,10 +71,11 @@ button {
 .brand-mark {
   width: 34px;
   height: 34px;
-  border-radius: 11px;
-  background: linear-gradient(135deg, var(--cyan), #d99809);
+  border-radius: 50%;
+  background: transparent;
   display: grid;
   place-items: center;
+  object-fit: cover;
   color: #06111e;
   font-weight: 800;
 }

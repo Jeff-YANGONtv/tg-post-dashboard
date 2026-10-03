@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "signal-relay-pwa-";
-const CACHE_NAME = `${CACHE_PREFIX}v1`;
+const CACHE_NAME = `${CACHE_PREFIX}v2`;
 const OFFLINE_PAGE = "/offline.html";
 
 self.addEventListener("install", event => {

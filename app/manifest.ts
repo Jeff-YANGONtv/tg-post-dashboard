@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Signal Relay — Telegram Content Dashboard",
-    short_name: "Signal Relay",
+    name: "TG SEMI AUTO",
+    short_name: "TG SEMI AUTO",
     description: "Manage Telegram content distribution from one dashboard.",
     start_url: "/",
     scope: "/",

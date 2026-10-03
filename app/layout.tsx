@@ -3,12 +3,13 @@ import type { Metadata, Viewport } from "next";
 import { PwaRegister } from "../components/pwa-register";
 
 export const metadata: Metadata = {
-  title: "Signal Relay",
+  title: "TG SEMI AUTO",
   description: "Telegram content distribution control room",
-  applicationName: "Signal Relay",
+  applicationName: "TG SEMI AUTO",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [
+      { url: "/favicon.ico", type: "image/x-icon" },
       { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
       { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Signal Relay",
+    title: "TG SEMI AUTO",
   },
 };
 

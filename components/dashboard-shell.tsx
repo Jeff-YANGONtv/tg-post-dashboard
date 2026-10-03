@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 import {
   Activity,
   CalendarClock,
@@ -28,9 +29,16 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     <div className="shell">
       <aside className="sidebar">
         <div className="brand">
-          <div className="brand-mark">↗</div>
+          <Image
+            className="brand-mark"
+            src="/icons/icon-192.png"
+            alt=""
+            width={34}
+            height={34}
+            unoptimized
+          />
           <div>
-            <div className="brand-title">SIGNAL RELAY</div>
+            <div className="brand-title">TG SEMI AUTO</div>
             <div className="brand-sub">TELEGRAM CONTROL ROOM</div>
           </div>
         </div>
@@ -63,9 +71,16 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
       <header className="mobile-brand">
-        <div className="brand-mark">↗</div>
+        <Image
+          className="brand-mark"
+          src="/icons/icon-192.png"
+          alt=""
+          width={34}
+          height={34}
+          unoptimized
+        />
         <div>
-          <div className="brand-title">SIGNAL RELAY</div>
+          <div className="brand-title">TG SEMI AUTO</div>
           <div className="brand-sub">TELEGRAM CONTROL ROOM</div>
         </div>
       </header>
