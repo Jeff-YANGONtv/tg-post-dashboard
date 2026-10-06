@@ -96,11 +96,23 @@ export type WebhookInfo = {
   pending_update_count: number;
   last_error_message?: string;
   last_error_date?: number;
+  allowed_updates?: string[];
 };
 export const setWebhook = (
   url: string,
   secret_token?: string,
   token?: string
-) => telegramCall<boolean>("setWebhook", { url, secret_token }, 0, token);
+) =>
+  telegramCall<boolean>(
+    "setWebhook",
+    {
+      url,
+      secret_token,
+      allowed_updates: ["channel_post"],
+      drop_pending_updates: false,
+    },
+    0,
+    token
+  );
 export const getWebhookInfo = (token?: string) =>
   telegramCall<WebhookInfo>("getWebhookInfo", {}, 0, token);

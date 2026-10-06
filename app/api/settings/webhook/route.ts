@@ -96,12 +96,14 @@ export async function POST(req: NextRequest) {
     let delivery: {
       pending_update_count?: number;
       last_error_message?: string | null;
+      allowed_updates?: string[];
     } = {};
     try {
       const info = await getWebhookInfo(token);
       delivery = {
         pending_update_count: info.pending_update_count,
         last_error_message: info.last_error_message ?? null,
+        allowed_updates: info.allowed_updates,
       };
     } catch {
       // The webhook was accepted; status details can be checked on a later attempt.

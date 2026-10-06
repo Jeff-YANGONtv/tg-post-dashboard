@@ -96,8 +96,14 @@ export default function Settings() {
         url: string;
         last_error_message?: string | null;
         pending_update_count?: number;
+        allowed_updates?: string[];
       }>(response);
-      if (data.last_error_message) {
+      if (
+        data.allowed_updates &&
+        !data.allowed_updates.includes("channel_post")
+      ) {
+        toast.error("Webhook connected, but channel posts are not enabled.");
+      } else if (data.last_error_message) {
         toast.warning(
           `Telegram accepted the webhook, but its latest delivery failed: ${data.last_error_message}`
         );
