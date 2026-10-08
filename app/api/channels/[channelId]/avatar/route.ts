@@ -19,10 +19,10 @@ function emptyResponse(status: number, cacheControl = "no-store") {
 
 export async function GET(
   request: Request,
-  { params }: { params: { channelId: string } }
+  { params }: { params: Promise<{ channelId: string }> }
 ) {
   void request;
-  const channelId = params.channelId;
+  const { channelId } = await params;
   if (!CHANNEL_ID_PATTERN.test(channelId)) return emptyResponse(404);
 
   const { data: channel, error } = await admin

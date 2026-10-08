@@ -71,6 +71,8 @@ export default function Channels() {
   }, []);
 
   useEffect(() => {
+    // This effect starts a data fetch; its loading state intentionally precedes the await.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (data?.channels.length) void refreshSubscriberCounts();
   }, [data?.channels.length, refreshSubscriberCounts]);
 
