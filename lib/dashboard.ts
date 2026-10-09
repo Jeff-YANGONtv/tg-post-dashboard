@@ -124,7 +124,6 @@ export function useDashboardData(options: DashboardDataOptions = {}) {
 
   useEffect(() => {
     // The initial request must transition loading/error state before its network await.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     void reload();
   }, [reload]);
 

@@ -17,6 +17,7 @@ export async function GET() {
   const { data, error } = await admin
     .from("channels")
     .select("*")
+    .eq("is_archived", false)
     .order("created_at", { ascending: false });
   if (error)
     return privateJson(
@@ -26,6 +27,35 @@ export async function GET() {
       500
     );
   return privateJson(data ?? []);
+}
+
+export async function DELETE(req: NextRequest) {
+  let body: { id?: string };
+  try {
+    body = await req.json();
+  } catch {
+    return privateJson({ error: "Request body must be valid JSON." }, 400);
+  }
+
+  if (!body.id || !/^[0-9a-f-]{36}$/i.test(body.id)) {
+    return privateJson({ error: "A valid channel ID is required." }, 400);
+  }
+
+  const { data, error } = await admin
+    .from("channels")
+    .update({ is_archived: true, is_active: false })
+    .eq("id", body.id)
+    .eq("is_archived", false)
+    .select("id")
+    .maybeSingle();
+
+  if (error)
+    return privateJson(
+      { error: `Could not remove channel: ${error.message}` },
+      500
+    );
+  if (!data) return privateJson({ error: "Channel not found." }, 404);
+  return privateJson({ ok: true, id: data.id });
 }
 
 export async function POST(req: NextRequest) {

@@ -1,14 +1,2 @@
-packages:
-  - "packages/*"
-
-# pnpm 10 compatibility (Cloudflare Workers Builds currently uses pnpm 10.11.1).
-onlyBuiltDependencies:
-  - esbuild
-  - unrs-resolver
-  - workerd
-
-# pnpm 10.26+ / pnpm 11+.
 allowBuilds:
-  esbuild: true
   unrs-resolver: true
-  workerd: true

@@ -1,6 +1,6 @@
 # Signal Relay — Telegram Content Distribution Dashboard
 
-A Next.js dashboard for ingesting Telegram channel posts, managing destination channels, publishing, scheduling, and reviewing deliveries. It can run on Vercel or Cloudflare Workers (via OpenNext).
+A Vercel-ready Next.js dashboard for ingesting Telegram channel posts, managing destination channels, publishing, scheduling, and reviewing deliveries.
 
 ## Public access warning
 
@@ -12,7 +12,7 @@ The Supabase service-role key, Telegram bot token, cron secret, and webhook secr
 
 1. Install dependencies with `pnpm install`.
 2. Copy `.env.example` to `.env.local` and set the Supabase project URL, server-only service-role key, and a strong random `CRON_SECRET`.
-3. Run `supabase/migrations/01_schema.sql` in the Supabase SQL editor.
+3. Run `supabase/migrations/01_schema.sql`, then `supabase/migrations/02_channel_archive.sql` in the Supabase SQL editor.
 4. Start the app with `pnpm dev`.
 
 ## Telegram setup
@@ -23,22 +23,11 @@ The Supabase service-role key, Telegram bot token, cron secret, and webhook secr
 - Save the bot token on the Settings page. The app checks it with Telegram before storing it.
 - Select **Connect webhook** on Settings. The app registers `https://YOUR_DOMAIN/api/telegram/webhook` with Telegram and creates/stores a shared secret in Supabase if none is already configured.
 
-## Deploy to Cloudflare Workers
+## Deploy
 
-This app uses Next.js App Router API routes, so a static Cloudflare Pages export is not sufficient. The repository is configured for Cloudflare Workers with the OpenNext adapter and a supported Next.js 16 release. Cloudflare currently recommends vinext for new projects; OpenNext is used here to retain the existing Next.js application and its route handlers.
+Import the repository into Vercel and set all variables from `.env.example`. Deploy from **`main` only**. No Vercel Cron is configured, so Hobby-plan deployments do not require a Cron-enabled plan. On a Hobby team, commits must be associated with the GitHub account linked to the Vercel team owner or production deployments may be blocked.
 
-1. Install with `pnpm install --frozen-lockfile`.
-2. Apply `supabase/migrations/01_schema.sql` to the Supabase project.
-3. In the Cloudflare Worker settings, set `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and a strong random `CRON_SECRET`. Store them as Worker variables/secrets; never commit real values. `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_SECRET` are optional fallbacks.
-4. For local Worker preview, copy `.dev.vars.example` to `.dev.vars` and add the required local values. `.dev.vars` is ignored by Git.
-5. Run `pnpm preview` to test in the Workers runtime, then `pnpm deploy` to publish. `wrangler.jsonc` has `workers_dev: false` and no public route by default; attach a custom domain only after restricting the dashboard with Cloudflare Access (or another trusted access layer).
-6. If Cloudflare Access is in use, allow only trusted dashboard users. Permit the Telegram webhook and scheduled-publish endpoint only as needed by the external services; those endpoints also validate their own webhook/cron secrets.
-
-The dashboard has no built-in sign-in. Anyone who can reach it can view dashboard data, publish/delete Telegram messages, manage channels and schedules, and change settings. The Settings write API is public by design and can replace the stored bot token/webhook secret. Do not expose a public hostname until access controls are in place.
-
-Scheduled posts are stored in Supabase, but this repository does not configure an automatic Cloudflare Cron trigger. Set up an external scheduler to call `/api/cron/publish-scheduled` with `Authorization: Bearer $CRON_SECRET`. The endpoint verifies this secret; internal publish requests use the same secret.
-
-For the alternative Vercel deployment path, import the repository into Vercel and set the same environment values. Deploy from `main`. Vercel Cron is not configured in this repository.
+Scheduled posts are saved in Supabase. Automatic dispatch requires an external scheduler (or a Vercel plan with Cron support) to call `/api/cron/publish-scheduled` with `Authorization: Bearer $CRON_SECRET`. Use a long, random secret and configure the same value in the deployment environment. The cron endpoint verifies the secret; its internal publish requests use the same secret.
 
 ## Install on Android
 
@@ -49,3 +38,5 @@ The dashboard is an installable PWA. Deploy it to an HTTPS URL, open it in Chrom
 The Channels page requests current member counts from Telegram when the page loads and includes a **Refresh counts** button. The bot must be able to access each channel; if Telegram rejects a count request, that channel displays **—** and the error is available as a tooltip.
 
 The page also ranks the **top five channels across both source and destination types** by current subscriber count. Channels whose counts could not be retrieved are omitted from the ranking.
+
+Channels can be removed from either the source or destination registry tab. Removal archives the channel and disables further use without deleting its post, schedule, or publication history. Apply `supabase/migrations/02_channel_archive.sql` to existing Supabase projects before using this action.
