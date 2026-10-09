@@ -101,6 +101,66 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const { data: existing, error: lookupError } = await admin
+      .from("channels")
+      .select("id,is_archived")
+      .eq("telegram_chat_id", chat.id)
+      .maybeSingle();
+
+    if (lookupError) {
+      return privateJson(
+        {
+          error: `Could not check for an existing channel: ${lookupError.message}`,
+        },
+        500
+      );
+    }
+
+    if (existing && !existing.is_archived) {
+      return privateJson(
+        { error: "This Telegram channel is already in the channel list." },
+        409
+      );
+    }
+
+    if (existing?.is_archived) {
+      const { data: restored, error: restoreError } = await admin
+        .from("channels")
+        .update({
+          type: body.type,
+          title: chat.title ?? String(chat.id),
+          username: chat.username ?? null,
+          is_archived: false,
+          is_active: true,
+          can_post: canPost,
+          can_delete: canDelete,
+          last_permission_check_at: new Date().toISOString(),
+          last_error: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", existing.id)
+        .eq("is_archived", true)
+        .select()
+        .maybeSingle();
+
+      if (restoreError) {
+        return privateJson(
+          { error: `Could not restore channel: ${restoreError.message}` },
+          500
+        );
+      }
+      if (!restored) {
+        return privateJson(
+          {
+            error:
+              "Channel was restored by another request. Refresh the list and try again.",
+          },
+          409
+        );
+      }
+      return privateJson({ ...restored, restored: true }, 200);
+    }
+
     const { data, error } = await admin
       .from("channels")
       .insert({
