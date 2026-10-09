@@ -17,6 +17,7 @@ export async function GET() {
   const { data: channels, error } = await admin
     .from("channels")
     .select("id,telegram_chat_id")
+    .eq("is_archived", false)
     .order("created_at", { ascending: false })
     .limit(200);
 

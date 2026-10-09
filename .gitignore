@@ -6,9 +6,6 @@
 dist/
 build/
 *.dist
-.open-next/
-.wrangler/
-cloudflare-env.d.ts
 
 # Environment variables
 .env
@@ -16,7 +13,6 @@ cloudflare-env.d.ts
 .env.development.local
 .env.test.local
 .env.production.local
-.dev.vars
 
 # IDE and editor files
 .vscode/

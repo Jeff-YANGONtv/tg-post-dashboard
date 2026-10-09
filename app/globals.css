@@ -1104,6 +1104,12 @@ button {
   overflow-wrap: anywhere;
   font-size: 10px;
 }
+.channel-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
 @media (max-width: 640px) {
   .post-list,
   .channel-grid {
@@ -1115,6 +1121,12 @@ button {
   }
   .channel-card-footer .btn {
     justify-content: center;
+  }
+  .channel-card-actions {
+    width: 100%;
+  }
+  .channel-card-actions .btn {
+    flex: 1;
   }
 }
 

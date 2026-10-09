@@ -8,6 +8,7 @@ import {
   RefreshCw,
   Send,
   ShieldAlert,
+  Trash2,
 } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import { DashboardShell } from "../../../components/dashboard-shell";
@@ -31,6 +32,7 @@ export default function Channels() {
   const [tab, setTab] = useState<"source" | "destination">("source");
   const [adding, setAdding] = useState(false);
   const [busyId, setBusyId] = useState("");
+  const [removingId, setRemovingId] = useState("");
   const [subscriberCounts, setSubscriberCounts] = useState<
     Record<string, SubscriberCount>
   >({});
@@ -72,7 +74,6 @@ export default function Channels() {
 
   useEffect(() => {
     // This effect starts a data fetch; its loading state intentionally precedes the await.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (data?.channels.length) void refreshSubscriberCounts();
   }, [data?.channels.length, refreshSubscriberCounts]);
 
@@ -124,6 +125,31 @@ export default function Channels() {
       );
     } finally {
       setBusyId("");
+    }
+  }
+
+  async function removeChannel(id: string, title: string) {
+    if (
+      !window.confirm(
+        `Remove “${title}” from the ${tab} channel list? Existing posts and delivery history will be kept.`
+      )
+    )
+      return;
+
+    setRemovingId(id);
+    try {
+      await request<{ ok: boolean }>("/api/channels", {
+        method: "DELETE",
+        body: JSON.stringify({ id }),
+      });
+      toast.success("Channel removed from the list.");
+      await reload();
+    } catch (cause) {
+      toast.error(
+        cause instanceof Error ? cause.message : "Could not remove channel."
+      );
+    } finally {
+      setRemovingId("");
     }
   }
 
@@ -371,17 +397,28 @@ export default function Channels() {
                       {formatDate(channel.last_permission_check_at)}
                     </strong>
                   </div>
-                  <button
-                    className="btn small"
-                    disabled={busyId === channel.id}
-                    onClick={() => void testChannel(channel.id)}
-                  >
-                    <RefreshCw
-                      size={12}
-                      className={busyId === channel.id ? "spin" : ""}
-                    />
-                    {busyId === channel.id ? "Checking…" : "Test permissions"}
-                  </button>
+                  <div className="channel-card-actions">
+                    <button
+                      className="btn small"
+                      disabled={busyId === channel.id || removingId === channel.id}
+                      onClick={() => void testChannel(channel.id)}
+                    >
+                      <RefreshCw
+                        size={12}
+                        className={busyId === channel.id ? "spin" : ""}
+                      />
+                      {busyId === channel.id ? "Checking…" : "Test permissions"}
+                    </button>
+                    <button
+                      className="btn small danger"
+                      disabled={removingId === channel.id || busyId === channel.id}
+                      onClick={() => void removeChannel(channel.id, channel.title)}
+                      aria-label={`Remove ${channel.title}`}
+                    >
+                      <Trash2 size={12} />
+                      {removingId === channel.id ? "Removing…" : "Remove"}
+                    </button>
+                  </div>
                 </div>
               </article>
             );

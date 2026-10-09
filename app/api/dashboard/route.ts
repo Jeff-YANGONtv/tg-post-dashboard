@@ -21,6 +21,7 @@ export async function GET() {
     admin
       .from("channels")
       .select("*")
+      .eq("is_archived", false)
       .order("created_at", { ascending: false })
       .limit(200),
     admin
