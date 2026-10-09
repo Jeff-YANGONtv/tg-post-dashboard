@@ -79,7 +79,10 @@ export default function Channels() {
 
   async function addChannel(formData: FormData) {
     try {
-      const result = await request<{ error?: string }>("/api/channels", {
+      const result = await request<{
+        error?: string;
+        restored?: boolean;
+      }>("/api/channels", {
         method: "POST",
         body: JSON.stringify({
           type: tab,
@@ -89,7 +92,11 @@ export default function Channels() {
         }),
       });
       if (result.error) throw new Error(result.error);
-      toast.success("Channel added.");
+      toast.success(
+        result.restored
+          ? `Channel restored to the ${tab} list.`
+          : "Channel added."
+      );
       setAdding(false);
       await reload();
     } catch (cause) {
@@ -400,7 +407,9 @@ export default function Channels() {
                   <div className="channel-card-actions">
                     <button
                       className="btn small"
-                      disabled={busyId === channel.id || removingId === channel.id}
+                      disabled={
+                        busyId === channel.id || removingId === channel.id
+                      }
                       onClick={() => void testChannel(channel.id)}
                     >
                       <RefreshCw
@@ -411,8 +420,12 @@ export default function Channels() {
                     </button>
                     <button
                       className="btn small danger"
-                      disabled={removingId === channel.id || busyId === channel.id}
-                      onClick={() => void removeChannel(channel.id, channel.title)}
+                      disabled={
+                        removingId === channel.id || busyId === channel.id
+                      }
+                      onClick={() =>
+                        void removeChannel(channel.id, channel.title)
+                      }
                       aria-label={`Remove ${channel.title}`}
                     >
                       <Trash2 size={12} />
